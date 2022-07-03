@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import PreGame from "./PreGame";
 import JoinedGame from "./JoinedGame";
 
-
-
 function App() {
   // uinum: 0 = preGame; 1 = joinedGame
   const [uiNum, setuiNum] = useState(0);
