@@ -1,0 +1,17 @@
+#card{
+    margin: 10px;
+    float:left;
+    width:fit-content;
+    border: 2px solid rgb(0, 0, 0);
+    text-indent: 10px;
+    
+}
+#txt {
+    margin: 10px ;
+}
+#btn{
+    margin: 5px;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-30%);
+    width: 50%;
+}

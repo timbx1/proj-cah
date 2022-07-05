@@ -1,0 +1,27 @@
+#helpDiv{
+    display: block;
+    margin-left: 60%;
+    margin-right: 10%;
+    overflow: hidden;
+    position:fixed;
+    background: fixed;
+    background-color: white;
+    z-index: 2;
+}
+#help{
+    float: right;
+}
+@media only screen and (max-width: 811px) {
+    #helpDiv{
+        margin-left: 30%;
+        margin-right: 10%;
+        z-index: 2;
+    }
+}
+@media only screen and (max-width: 412px) {
+    #helpDiv{
+        margin-left: 10%;
+        margin-right: 10%;
+        z-index: 2;
+    }
+}

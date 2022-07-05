@@ -12,7 +12,7 @@ const Recycle_bin = () => {
         function clearPlayers(data){
             for(let i = 0;i < data.length; i++){
                 axios.delete(config.preUrl+'/players/'+data[i].id).then(response =>{
-                    console.log(response)
+                    console.log(response.data)
                 })
             }
 
@@ -23,9 +23,9 @@ const Recycle_bin = () => {
         })
 
         function clearGames(data){
-            for(let i = 0;i < data.length; i++){
+            for(let i = 0; i < data.length; i++){
                 axios.delete(config.preUrl+'/games/'+data[i].id).then(response =>{
-                    console.log(response)
+                    console.log(response.data)
                 })
             }
 

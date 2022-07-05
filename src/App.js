@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import PreGame from "./PreGame";
 import JoinedGame from "./JoinedGame";
+import InGame from "./InGame";
 
 function App() {
-  // uinum: 0 = preGame; 1 = joinedGame
+  // uinum: 0 = preGame; 1 = joinedGame; 2 = inGame
   const [uiNum, setuiNum] = useState(0);
   const [playerData, setplayerData] = useState()
   const [gameid, setgameid] = useState()
@@ -24,10 +25,17 @@ function App() {
     
     );
   }
-  else{
+  else if(uiNum == 1){
     return (
       <div>
         <JoinedGame changeUi = {changeUi} pData={playerData} gId={gameid} />
+      </div>
+    )
+  }
+  else if(uiNum == 2){
+    return (
+      <div>
+        <InGame changeUi = {changeUi} pData={playerData} gId={gameid} />
       </div>
     )
   }

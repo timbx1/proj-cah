@@ -1,19 +1,49 @@
-import React, { useState } from 'react'
+import React, { Component, useState, useEffect } from 'react'
 import axios from 'axios'
 import config from './config.json'
-import { hasSelectionSupport } from '@testing-library/user-event/dist/utils'
+import { Status } from './Status'
+import { Hilfe } from './Hilfe'
 
 function JoinedGame(props) {
   const playerData = props.pData
   const gameid = props.gId
   const [players , setPlayers] = useState()
-//thread? if game.running true ...
-  function startGame (){
+  const [buttonRefresh , setRefresh] = useState("Refresh")
 
+  useEffect(()=>{
+    getGameData()
+  },[])
+
+  function goToGame(){
+    props.changeUi(2,playerData,gameid)
   }
 
-  getGameData()
+  function startGame (){
+    console.log("start")
+    let Jstring = '{"player":'+playerData.id+',"action":"start"}' 
+    let msg = JSON.parse(Jstring)
+    axios.patch(config.preUrl+'/games/'+gameid+'/'+playerData.id,msg).then(response => {
+      goToGame()
+    })
+  }
+  function checkIfRunning (game, index){
+    axios.get(config.preUrl+'/games/').then(response => {
+      
+      if(!response.data.games[index].running){
+        setTimeout(checkIfRunning(game ,index), 5000) 
+      }
+      else{
+        goToGame()
+      }
+      
+    }) 
+    
+  }
+
+
   function showPlayers(gameData){
+    
+  
     var index = 0;
     for(let i = 0; i < gameData.length; i++){
       if (gameData[i].id == gameid){
@@ -28,45 +58,38 @@ function JoinedGame(props) {
     if (gameData[index].owner.id == playerData.id){
       pList.push(<p key={"p2"}> </p>)
       pList.push(<button key={"onlyowner"} onClick={startGame}>START GAME</button>)
+      setPlayers(pList)
     }
     else{
       pList.push(<p key={"p3"} style={{color:'red'}}>Wait for owner to Start Game</p>)
       setPlayers(pList)
-      checkIfRunning(gameData[index])
+      checkIfRunning(gameData[index],index)
     }
 
-    setPlayers(pList)
+    
     
   }
 
-  function checkIfRunning (game){
-    let running = false
-    while(
-      !running
-    )
-    {
-      hasSelectionSupport(5000);
-      axios.get(config.preUrl+'/games/').then(response => {
-        console.log(running)
-        running = response.data.games[gameid].running
-        
-      })
-    }
-    
-  }
+
 
   function getGameData (){
+    setRefresh("Refresh")
     axios.get(config.preUrl+'/games/').then(response => {
+      console.log(response.data.games)
       showPlayers(response.data.games)
       
     })
 
   }
   
+  
   return (
     <div>
+        <script type="text/javascript">document.getElementById("reload").click();</script>
         <label>Players: </label>
-        <button onClick={getGameData}>Refresh</button>
+        <button onClick={getGameData} id ="reload">{buttonRefresh}</button>
+        <Hilfe/>
+        <Status gId = {gameid} />
         <div>{players}</div>
     </div>
   )

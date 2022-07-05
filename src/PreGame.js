@@ -2,6 +2,7 @@ import React,{ useRef, useState } from 'react'
 import axios from 'axios'
 import config from './config.json'
 import Recycle_bin from './Recycle_bin'
+import { Hilfe } from './Hilfe'
 
 function PreGame({changeUi}) {
     const nameInRef = useRef()
@@ -13,22 +14,23 @@ function PreGame({changeUi}) {
     }
 
     function joinGame(gameid,playerdata){
-       
+        setOutPreGame(outPreGame+'.')
         var Jstring = '{"player":'+ playerdata.id +',"action":"join"}'
         var msg = JSON.parse(Jstring)
         
-        axios.patch(config.preUrl+'/games/' + gameid, msg).then(response => {
-            console.log(response.data)
+        axios.patch(config.preUrl+'/games/' + gameid + '/' + playerdata.id, msg).then(response => {
+            
             goToGame(playerdata,gameid) 
         })  
         
     }
     function createGame(playerdata){
+        setOutPreGame(outPreGame+'.')
         var userid = playerdata.id
         var Jstring = '{"owner":'+userid+'}'
         var msg = JSON.parse(Jstring)
         axios.post(config.preUrl+'/games/',msg).then(response => {
-            console.log(response.data)
+            
             goToGame(playerdata,response.data.id)
         })
         
@@ -36,11 +38,11 @@ function PreGame({changeUi}) {
     /*wenn spiel mit weniger als 4 leuten und !running dann 
     beitreten ansonsten spiel erstellen mit sich selbst als owner*/
     function scanGames (games, data){
-        setOutPreGame("LOADING...")
+        setOutPreGame(outPreGame+'.')
         
         var send = false
-        if (games.length-1 > 0){
-            for(let i = 0; i < games.length-1;i++){
+        if (!(games.length === 0)){
+            for(let i = 0; i < games.length;i++){
                 if((games[i].players.length) < 3 && !(games[i].running)){
                     
                     joinGame(games[i].id,data)
@@ -60,7 +62,7 @@ function PreGame({changeUi}) {
     }
     //get games
     function searchGame(data){
-        setOutPreGame("LOADING..")
+        setOutPreGame(outPreGame+'.')
         axios.get(config.preUrl+'/games/').then(response => {
             scanGames( response.data.games, data )
         })      
@@ -76,12 +78,12 @@ function PreGame({changeUi}) {
 
     // wenn name nicht vergeben POST player
     function setName(inName, data){
-        setOutPreGame("LOADING.")
+        setOutPreGame(outPreGame+'.')
         var send = false
         if (inName == ''){ setOutPreGame("NO NAME ENTERED")}
         else{ 
-            if(data.length-1 > 0){
-                for(let i = 0; i< data.length-1;i++){
+            if(!(data.length === 0)){
+                for(let i = 0; i< data.length;i++){
                     if (data[i].name == inName){
                         setOutPreGame("NAME ALLREADY TAKEN")
                         return 
@@ -118,6 +120,7 @@ function PreGame({changeUi}) {
             <label>Enter Name: </label>
             <input ref={nameInRef} type="text"></input>
             <button onClick={handleSearch} >SEARCH GAME</button>
+            <Hilfe/>
             <Recycle_bin />
         </div>
         <div>
