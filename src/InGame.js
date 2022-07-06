@@ -21,18 +21,23 @@ const InGame = (props) => {
 
     const [blackCard, setBlackCard] = useState()
     const [czar, setCzar] = useState('loading')
+
+    let pointArray 
     
 
     useEffect(()=>{
-        pullPoints()
-        getBlackCard()
-        getCzar()
+        refresh()
         
       },[])
     function offerCard(cId,text){
         setCardToOfferID(cId)
         setCardToOfferText(text)
         putCard(cId)
+    }
+    function refresh(){
+        pullPoints()
+        getBlackCard()
+        getCzar()
     }
     //if czar no white cards
     function getCzar(){
@@ -44,48 +49,70 @@ const InGame = (props) => {
         })
     }
 
-    //make div for each points of player
+    //pull player points
     function pullPoints (){
         axios.get(config.preUrl+'/games/'+gameid).then(response => {
             console.log("points pulled")
             createPoints(response.data.points)
         })
     }
-    //map every point as paragraph
+    //map every Player point as paragraph
     function createPoints(pointArr){
+        pointArray = pointArr
         var pList = []
         pList.push(<p key={"p1"}> </p>)
         pList.push(pointArr.map((point) => (<div key={pointId+=1}> : {point} |</div>)))
         setPoints(pList)
     }
-    //renders Cards of Player
+    //renders White Cards of Player
     //btnboo true => use btn rendernn false => vote btn rendern
     function createWhiteCards(cardsArr,boo){
         let cList = []
         cList.push(cardsArr.map((eintrag) => (
         <div>
             <p> </p>
-            <Card key={eintrag.id} btnboo={boo} offerCard={offerCard} pId={playerData.id} gId={gameid} cId={eintrag.id} text={eintrag.text} />
+            <Card key={eintrag.id} btnboo={boo} voteCard={voteCard} offerCard={offerCard} pId={playerData.id} gId={gameid} cId={eintrag.id} text={eintrag.text} />
         </div>
         )))
         setCards(cList)
     }
+    //pull white cards of Player to chose
     function getWhiteCards(){
         axios.get(config.preUrl+'/games/'+gameid+'/cards/'+playerData.id).then(response => {
             createWhiteCards(response.data.cards,true)
         })
     }
+    // pull black card
     function getBlackCard (){
         axios.get(config.preUrl+'/games/'+gameid).then(response => {
             setBlackCard(response.data.currentBlackCard.text)
         })
     }
+    //callback from Vote button in Cards
+    function voteCard(){
+        console.log("vote")
+        refresh()
+
+    }
+    // if points change refresh page
+    function waitForCzarToVote(){
+        console.log('waiting')
+        axios.get(config.preUrl+'/games/'+gameid).then(response =>{
+            console.log(response.data.points)
+            console.log(pointArray)
+            if(JSON.stringify(response.data.points) == JSON.stringify(pointArray)){
+                waitForCzarToVote()
+            }else{
+                refresh()
+            }
+        })
+    }
+    // offer card to czar
     function putCard(id){
-        console.log("put")
         let Jstring = '{"cards":['+id+']}'
         let msg = JSON.parse(Jstring)
         axios.put(config.preUrl+'/games/'+gameid+'/cards/'+playerData.id,msg).then(response =>{
-          console.log(response.data)
+          waitForCzarToVote()
         })
     }
     //Timer timeout callback wenn czar dann get offers

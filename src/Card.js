@@ -16,12 +16,19 @@ const Card = (props) => {
       },[])
 
     function useCard(){
-      console.log('use')
       props.offerCard(props.cId,props.text)
     }
+    // if czar dann vote button auf offer cards -> callback to inGame
+    ///////////////////////////////////////////////////////////////// VOTE NOT WORKING
     function voteCard(){
-      console.log('use')
-      props.offerCard(props.cId,props.text)
+      console.log('vote')
+      let Jstring = '{"cards":['+ props.cId +']}'
+      let msg = JSON.parse(Jstring)
+      axios.put(config.preUrl+'/games/'+props.gId+'/offers/'+props.pId,msg).then(response => {
+        props.voteCard()
+        console.log(response.data)
+      })
+
     }
     function createButtonUse(){
       setUseBtn(<button id='btn' onClick={useCard}>USE</button>)
@@ -32,7 +39,7 @@ const Card = (props) => {
   return (
     <div id='card'>
         <p id='txt'>{text}</p>
-        <div class="vertical-center">
+        <div id="vertical-center">
             <div>{useBtn}</div>
         </div>
     </div>
