@@ -118,14 +118,30 @@ const InGame = (props) => {
           waitForCzarToVote()
         })
     }
+    function createZarCards(cardsArr,boo){
+        let cList = []
+        for (let i = 0 ; i <cardsArr.length; i++ ){
+            
+            cList.push(cardsArr[i].map((eintrag) => (
+            <div>
+                <p> </p>
+                <Card key={eintrag.id} btnboo={boo} voteCard={voteCard} offerCard={offerCard} pId={playerData.id} gId={gameid} cId={eintrag.id} text={eintrag.text} />
+            </div>
+            )))
+            
+        }
+        setCards(cList)  
+    }
     //Timer timeout callback wenn czar dann get offers
     function onExpire(){
         console.log('player: '+playerData.id+' game: '+gameid)
         if(czar.id === playerData.id){
-            //[1] ändernn wenn api rdy
             axios.get(config.preUrl+'/games/'+gameid+'/offers/'+playerData.id).then(response => {
-                createWhiteCards(response.data.offers[1],false)
-                console.log(response.data.offers[1])
+                
+                    
+                    createZarCards(response.data.offers,false)
+                    console.log(response.data.offers)
+                
             })
         }
     }
