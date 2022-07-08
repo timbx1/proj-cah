@@ -22,7 +22,7 @@ const Card = (props) => {
     ///////////////////////////////////////////////////////////////// VOTE NOT WORKING
     function voteCard(){
       console.log('vote')
-      let Jstring = '{"cards":['+ props.cId +']}'
+      let Jstring = '{"cards":['+ props.cId +']}' //{[{"cards":['+ props.cId +']}][1]}
       let msg = JSON.parse(Jstring)
       axios.put(config.preUrl+'/games/'+props.gId+'/offers/'+props.pId,msg).then(response => {
         props.voteCard()

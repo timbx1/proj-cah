@@ -24,16 +24,18 @@ const InGame = (props) => {
 
     let pointArray 
     
-
+    //'main method'
     useEffect(()=>{
         refresh()
         
       },[])
+    // load offer preview and put it
     function offerCard(cId,text){
         setCardToOfferID(cId)
         setCardToOfferText(text)
         putCard(cId)
     }
+    //load divs
     function refresh(){
         pullPoints()
         getBlackCard()
@@ -96,10 +98,9 @@ const InGame = (props) => {
     }
     // if points change refresh page
     function waitForCzarToVote(){
-        console.log('waiting')
+
         axios.get(config.preUrl+'/games/'+gameid).then(response =>{
-            console.log(response.data.points)
-            console.log(pointArray)
+
             if(JSON.stringify(response.data.points) == JSON.stringify(pointArray)){
                 waitForCzarToVote()
             }else{
@@ -108,7 +109,9 @@ const InGame = (props) => {
         })
     }
     // offer card to czar
+    //----> put wechselt abgegebene Karten 
     function putCard(id){
+        console.log('player: '+playerData.id+' game: '+gameid)
         let Jstring = '{"cards":['+id+']}'
         let msg = JSON.parse(Jstring)
         axios.put(config.preUrl+'/games/'+gameid+'/cards/'+playerData.id,msg).then(response =>{
@@ -117,6 +120,7 @@ const InGame = (props) => {
     }
     //Timer timeout callback wenn czar dann get offers
     function onExpire(){
+        console.log('player: '+playerData.id+' game: '+gameid)
         if(czar.id === playerData.id){
             //[1] ändernn wenn api rdy
             axios.get(config.preUrl+'/games/'+gameid+'/offers/'+playerData.id).then(response => {
