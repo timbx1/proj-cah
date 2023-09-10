@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PreGame from "./PreGame";
 import JoinedGame from "./JoinedGame";
 import InGame from "./InGame";
+import PacksView from "./PacksView";
 
 function App() {
   // uinum: 0 = preGame; 1 = joinedGame; 2 = inGame
@@ -19,7 +20,7 @@ function App() {
   if (uiNum == 0){
   return (
     <div>
-        <PreGame changeUi = {changeUi} />
+        <PreGame changeUi = {changeUi} pData={playerData} gId={gameid} />
         <p>{playerData}</p>
     </div>
     
@@ -36,6 +37,13 @@ function App() {
     return (
       <div>
         <InGame changeUi = {changeUi} pData={playerData} gId={gameid} />
+      </div>
+    )
+  }
+  else if(uiNum == 3){
+    return (
+      <div>
+        <PacksView changeUi = {changeUi} pData={playerData} gId = {gameid} />
       </div>
     )
   }

@@ -43,7 +43,7 @@ const InGame = (props) => {
     }
     //if czar no white cards
     function getCzar(){
-        axios.get(config.preUrl+'/games/'+gameid).then(response => {
+        axios.get(config.preUrl+'games/'+gameid).then(response => {
             setCzar(response.data.czar)
             if(response.data.czar.id != playerData.id){
                 getWhiteCards()
@@ -53,7 +53,7 @@ const InGame = (props) => {
 
     //pull player points
     function pullPoints (){
-        axios.get(config.preUrl+'/games/'+gameid).then(response => {
+        axios.get(config.preUrl+'games/'+gameid).then(response => {
             console.log("points pulled")
             createPoints(response.data.points)
         })
@@ -80,13 +80,13 @@ const InGame = (props) => {
     }
     //pull white cards of Player to chose
     function getWhiteCards(){
-        axios.get(config.preUrl+'/games/'+gameid+'/cards/'+playerData.id).then(response => {
+        axios.get(config.preUrl+'games/'+gameid+'/cards/'+playerData.id).then(response => {
             createWhiteCards(response.data.cards,true)
         })
     }
     // pull black card
     function getBlackCard (){
-        axios.get(config.preUrl+'/games/'+gameid).then(response => {
+        axios.get(config.preUrl+'games/'+gameid).then(response => {
             setBlackCard(response.data.currentBlackCard.text)
         })
     }
@@ -114,7 +114,7 @@ const InGame = (props) => {
         console.log('player: '+playerData.id+' game: '+gameid)
         let Jstring = '{"cards":['+id+']}'
         let msg = JSON.parse(Jstring)
-        axios.put(config.preUrl+'/games/'+gameid+'/cards/'+playerData.id,msg).then(response =>{
+        axios.put(config.preUrl+'games/'+gameid+'/cards/'+playerData.id,msg).then(response =>{
           waitForCzarToVote()
         })
     }
@@ -125,7 +125,7 @@ const InGame = (props) => {
             cList.push(cardsArr[i].map((eintrag) => (
             <div>
                 <p> </p>
-                <Card key={eintrag.id} btnboo={boo} voteCard={voteCard} offerCard={offerCard} pId={playerData.id} gId={gameid} cId={eintrag.id} text={eintrag.text} />
+                <Card key={eintrag.id} btnboo={boo} showBtn = {true} voteCard={voteCard} offerCard={offerCard} pId={playerData.id} gId={gameid} cId={eintrag.id} text={eintrag.text} />
             </div>
             )))
             
@@ -136,7 +136,7 @@ const InGame = (props) => {
     function onExpire(){
         console.log('player: '+playerData.id+' game: '+gameid)
         if(czar.id === playerData.id){
-            axios.get(config.preUrl+'/games/'+gameid+'/offers/'+playerData.id).then(response => {
+            axios.get(config.preUrl+'games/'+gameid+'/offers/'+playerData.id).then(response => {
                 
                     
                     createZarCards(response.data.offers,false)

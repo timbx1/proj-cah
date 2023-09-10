@@ -22,12 +22,12 @@ function JoinedGame(props) {
     console.log("start")
     let Jstring = '{"player":'+playerData.id+',"action":"start"}' 
     let msg = JSON.parse(Jstring)
-    axios.patch(config.preUrl+'/games/'+gameid+'/'+playerData.id,msg).then(response => {
+    axios.patch(config.preUrl+'games/'+gameid+'/'+playerData.id,msg).then(response => {
       goToGame()
     })
   }
   function checkIfRunning (game, index){
-    axios.get(config.preUrl+'/games/').then(response => {
+    axios.get(config.preUrl+'games/').then(response => {
       
       if(!response.data.games[index].running){
         setTimeout(checkIfRunning(game ,index), 5000) 
@@ -74,7 +74,7 @@ function JoinedGame(props) {
 
   function getGameData (){
     setRefresh("Refresh")
-    axios.get(config.preUrl+'/games/').then(response => {
+    axios.get(config.preUrl+'games/').then(response => {
       console.log(response.data.games)
       showPlayers(response.data.games)
       

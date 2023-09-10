@@ -5,13 +5,20 @@ import config from './config.json'
 const Card = (props) => {
     const [text,setText] = useState("No Text Loaded")
     const [useBtn,setUseBtn] = useState()
+    const [type, setType] = useState('')
+    //zeigt vote button an oder auch nicht 
     useEffect(()=>{
         setText(props.text)
-        if(props.btnboo){
-          createButtonUse()
+        if (props.showBtn){
+          if(props.btnboo){
+            createButtonUse()
+          }
+          else{
+            createButtonVote()
+          }
         }
         else{
-          createButtonVote()
+          setType(props.type)
         }
       },[])
 
@@ -38,6 +45,7 @@ const Card = (props) => {
     }
   return (
     <div id='card'>
+        <p>{type}</p>
         <p id='txt'>{text}</p>
         <div id="vertical-center">
             <div>{useBtn}</div>
