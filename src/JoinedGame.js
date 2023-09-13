@@ -9,12 +9,14 @@ function JoinedGame(props) {
   const gameid = props.gId
   const [players , setPlayers] = useState()
   const [buttonRefresh , setRefresh] = useState("Refresh")
+  
 
   useEffect(()=>{
     getGameData()
   },[])
 
   function goToGame(){
+    console.log('start_game')
     props.changeUi(2,playerData,gameid)
   }
 
@@ -26,6 +28,7 @@ function JoinedGame(props) {
       goToGame()
     })
   }
+  //
   function checkIfRunning (game, index){
     axios.get(config.preUrl+'games/').then(response => {
       
@@ -54,7 +57,7 @@ function JoinedGame(props) {
     var pList = []
     pList.push(<p key={"p1"}> </p>)
     pList.push(players.map((user) => (<div key={user.id}>|  {user.name} </div>)))
-
+    //ist spieler owner
     if (gameData[index].owner.id == playerData.id){
       pList.push(<p key={"p2"}> </p>)
       pList.push(<button key={"onlyowner"} onClick={startGame}>START GAME</button>)

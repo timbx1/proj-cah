@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Card from './Card'
 import axios from 'axios'
 import config from './config.json'
@@ -11,6 +11,26 @@ function Pack(props) {
     const [whiteCards,setWhiteCards] = useState()
     const [blackCards,setBlackCards] = useState()
     const [buttonTag, setButtonTag]= useState("SHOW PACK")
+
+    const [usePackBtn,setUsePackBtn] = useState()
+
+    const [showUsePacks, setShowUsePacks] = useState(false);
+
+    function _init(){
+        if (props.usePack){
+            setUsePackBtn(
+                <button onClick={handleUsePack}>
+                {showUsePacks ? 'Remove Pack' : 'Choose Pack'}
+              </button>
+            )
+        }
+    }
+
+    useEffect(() => {
+        _init()
+      }, []);
+      
+
     function showPack(){
 
         if (packOpen){
@@ -52,9 +72,21 @@ function Pack(props) {
         )))
         setBlackCards(cList)
     }
+    function handleUsePack(){
+        setShowUsePacks(!showUsePacks)
+        if(!showUsePacks){
+            props.addId(id)
+        }
+        else{
+            props.removeId(id)
+        }
+    }
 
   return (
     <div id = 'card'>
+
+        {usePackBtn}
+
         <p>Pack</p>
         <p>ID:</p>
         <p>{id}</p>

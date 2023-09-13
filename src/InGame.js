@@ -73,7 +73,7 @@ const InGame = (props) => {
         cList.push(cardsArr.map((eintrag) => (
         <div>
             <p> </p>
-            <Card key={eintrag.id} btnboo={boo} voteCard={voteCard} offerCard={offerCard} pId={playerData.id} gId={gameid} cId={eintrag.id} text={eintrag.text} />
+            <Card key={eintrag.id} showBtn={true} btnboo={boo} voteCard={voteCard} offerCard={offerCard} pId={playerData.id} gId={gameid} cId={eintrag.id} text={eintrag.text} />
         </div>
         )))
         setCards(cList)
@@ -99,7 +99,7 @@ const InGame = (props) => {
     // if points change refresh page
     function waitForCzarToVote(){
 
-        axios.get(config.preUrl+'/games/'+gameid).then(response =>{
+        axios.get(config.preUrl+'games/'+gameid).then(response =>{
 
             if(JSON.stringify(response.data.points) == JSON.stringify(pointArray)){
                 waitForCzarToVote()

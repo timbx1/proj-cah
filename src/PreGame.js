@@ -8,8 +8,15 @@ import Game from './Game'
 function PreGame({changeUi, pData, gId}) {
     const nameInRef = useRef()
     const [outPreGame, setOutPreGame] = useState("")
-
+    const [gamesLabel, setGamesLabel] = useState("")
+    const [nameLabel, setNameLabel] = useState('Enter Name:')
     const [games, setGames] = useState()
+    const [searchBox, setSearchBox] = useState(
+        <div>
+            <input ref={nameInRef} type="text"></input>
+            <button onClick={handleSearch} >SEARCH GAME</button>
+        </div>
+    )
 
     function goToGame(num,playerdata,gameid){
         console.log('gotogame')
@@ -66,12 +73,13 @@ function PreGame({changeUi, pData, gId}) {
             createGame(data)
         }
     } 
-    function mapGames (gameArr) {
+    function mapGames (gameArr,data) {
+        setGamesLabel('Games:')
         let pList = []
         pList.push(gameArr.map((eintrag) => (
         <div>
             <p> </p>
-            <Game gId={eintrag.id} owner = {eintrag.owner} goal = {eintrag.goal} packs ={eintrag.packs} player = {eintrag.players}></Game>
+            <Game joinGame={joinGame} gId={eintrag.id} owner = {eintrag.owner} goal = {eintrag.goal} packs ={eintrag.packs} player = {eintrag.players} playerData={data}></Game>
         </div>
         )))
         setGames(pList)
@@ -81,21 +89,35 @@ function PreGame({changeUi, pData, gId}) {
         setOutPreGame(outPreGame+'.')
         axios.get(config.preUrl+'games/').then(response => {
             console.log(response.data.games)
-            scanGames( response.data.games, data )
-            mapGames(response.data.games)
+            //scanGames( response.data.games, data )
+            mapGames(response.data.games,data)
         })      
     }
 
-    function postPlayers(inName){
+    function postPlayers(inName,createGame){
         var Jstring = '{"name":' +'"' + inName + '"' + '}'
         var msg = JSON.parse(Jstring)
         axios.post(config.preUrl+'players/', msg).then(response =>{
-            searchGame(response.data)
+            
+            if (createGame){
+                goToCreateGame(response.data)
+            }
+            else{
+                searchGame(response.data)
+            }
         })
     }
+    function update_search_box(inName){
+        setSearchBox(
+            <label>{inName}</label>
+        )
 
+    }
+    function goToCreateGame(data){
+        changeUi(4,data,gId)
+    }
     // wenn name nicht vergeben POST player
-    function setName(inName, data){
+    function setName(inName, data, createGame){
         setOutPreGame(outPreGame+'.')
         var send = false
         if (inName == ''){ setOutPreGame("NO NAME ENTERED")}
@@ -104,7 +126,6 @@ function PreGame({changeUi, pData, gId}) {
                 for(let i = 0; i< data.length;i++){
                     if (data[i].name == inName){
                         setOutPreGame("NAME ALLREADY TAKEN")
-                        return 
                     }
                     else{
                         send = true
@@ -112,35 +133,50 @@ function PreGame({changeUi, pData, gId}) {
                     
                 }
                 if (send){
-                    postPlayers(inName)
+                    postPlayers(inName,createGame)
+                    update_search_box(inName)
+                    setNameLabel('Your Name: ')
+
                 }
             }
             else{
-                postPlayers(inName)
+                postPlayers(inName,createGame)
+                update_search_box(inName)
+                setNameLabel('Your Name: ')
             }
         }
         
-        return
+        
     }
     //get all players
-    function handleSearch(e){
+    function getName(createGame){
+        setOutPreGame('')
         setOutPreGame("LOADING")
         const inName =nameInRef.current.value
-        axios.get(config.preUrl+'players/').then(response => {
-            setName(inName, response.data.players)
-        })
 
+        axios.get(config.preUrl+'players/').then(response => {
+            setName(inName, response.data.players, createGame)
+        })
+    }
+
+    function handleSearch(e){
+        getName(false)
         return
     }
     function handleViewPacks(){
         goToGame(3,gId,pData)
     }
+    function handleCreateGame(){
+        getName(true)
+       
+    }
   return (
     <div>
         <div>
-            <label>Enter Name: </label>
-            <input ref={nameInRef} type="text"></input>
-            <button onClick={handleSearch} >SEARCH GAME</button>
+            <label>{nameLabel}</label>
+
+            <div>{searchBox}</div>
+            <button onClick={handleCreateGame}>Create Game</button>
             <button onClick={handleViewPacks}>View Packs</button>
             <Hilfe/>
             <Recycle_bin />
@@ -148,6 +184,7 @@ function PreGame({changeUi, pData, gId}) {
         <div>
             <output style={{color: 'red'}}>{outPreGame}</output>
         </div>
+        <div>{gamesLabel}</div>
         <div>
             {games}
         </div>

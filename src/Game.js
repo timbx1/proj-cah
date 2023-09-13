@@ -4,9 +4,10 @@ import axios from 'axios'
 import config from './config.json'
 function Game(props) {
 
-    const [detailsShown, setDetailsShown] = useState(false)
+    const [detailsShown, setDetailsShown] = useState(true)
 
     const id = props.gId
+    const player_data = props.playerData
     const owner = props.owner
     const goal = props.goal
 
@@ -15,6 +16,12 @@ function Game(props) {
 
     const playerArr = props.player
     const [player,setPlayer] = useState()
+
+    const [details, setDetails] = useState() 
+
+    const [player_label, setPlayerLabel] = useState('')
+
+    const [joinGameBtn, setJoinGameBtn] = useState()
 
     function getPacks (){
         let pacArr = []
@@ -41,7 +48,7 @@ function Game(props) {
         console.log('im here')
         let pList = []
         pList.push(playerArr.map((eintrag) => (
-            <div>
+            <div key={eintrag.id}>
                 <p> </p>
                 <p>{eintrag.name}</p>
             </div>
@@ -50,33 +57,55 @@ function Game(props) {
         setPlayer(pList)
     }
 
+    function handleJoinGameBtn(id, player_data){ //playerData not defined error!!!
+        console.log(player_data)
+        props.joinGame(id, player_data)
+    }
+
     function handleDetails(){
         if(detailsShown){
             getPacks()
             createPlayer() 
             setDetailsShown(false)
+            setDetails(
+                <div>        
+                <p>ID: {id}</p>
+                <p></p>
+        
+                <p>owner: {owner.name}</p>
+                <p></p>
+        
+                <p>Goal: {goal} Points</p>
+                <p></p>
+                </div>
+            )
+            setPlayerLabel('Players:')
+            setJoinGameBtn(
+                <button onClick={() => handleJoinGameBtn(id,player_data)}>JOIN GAME</button>
+            )
         }
         else{
             setDetailsShown(true)
             setPacks('')
             setPlayer('')
+            setDetails(
+                <div></div>
+            )
+            setPlayerLabel()
+            setJoinGameBtn()
         }
 
         }
   return (
     <div>
-        <p>ID:</p>
-        <p>{id}</p>
-
-        <p>owner:</p>
-        <p>{owner}</p>
-
-        <p>Goal: </p>
-        <p>{goal} Points</p>
-
         <button onClick={handleDetails}>Details</button>
+        <div>{details}</div>
+        <div>{player_label}</div>
         <div>{player}</div>
+        <div>{joinGameBtn}</div>
         <div>{packs}</div>
+        
+
     </div>
   )
 }
