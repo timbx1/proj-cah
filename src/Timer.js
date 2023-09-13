@@ -1,30 +1,37 @@
-import React, { useEffect } from 'react';
-import { useTimer } from 'react-timer-hook'
+import React, { useEffect, useRef } from 'react';
+import { useTimer } from 'react-timer-hook';
+
 function Timer(props) {
-    const {
-      seconds,
-      minutes,
-      hours,
-      days,
-      isRunning,
-      start,
-      pause,
-      resume,
-      restart,
-    } = useTimer({onExpire: () => timeout()});
-    function timeout(){
-        props.onExpire()
+  const {
+    seconds,
+    minutes,
+    restart,
+    expiryTimestamp,
+  } = useTimer({ expiryTimestamp: props.expiryTimestamp });
+
+  const timerRef = useRef();
+
+  useEffect(() => {
+    timerRef.current = restart; // Store the restart function in a ref
+
+    // When the component unmounts, clear the timer
+    return () => {
+      timerRef.current(null);
+    };
+  }, [props.expiryTimestamp]);
+
+  useEffect(() => {
+    // When the timer expires, call the onExpire callback
+    if (minutes === 0 && seconds === 0) {
+      props.onExpire();
     }
-    useEffect(()=>{
-        const time = new Date();
-        time.setSeconds(time.getSeconds() + 10);
-        restart(time)
-    },[])
-  
-    return (
-      <div style={{textAlign: 'center'}}>
-          <span>{minutes}</span>:<span>{seconds}</span>
-      </div>
-    );
-  }
-export default Timer
+  }, [minutes, seconds, props.onExpire]);
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <span>{minutes < 10 ? '0' : ''}{minutes}</span>:<span>{seconds < 10 ? '0' : ''}{seconds}</span>
+    </div>
+  );
+}
+
+export default Timer;

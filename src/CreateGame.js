@@ -32,10 +32,7 @@ function CreateGame(props) {
   }
 
   function addId(id){
-    let arr = []
-    for (let i=0; i<packs.length; i++){
-      arr.push(packs[i])
-    }
+    let arr = packs
     arr.push(id)
     setPacks(arr)
     console.log(id)
