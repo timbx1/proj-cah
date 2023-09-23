@@ -1,0 +1,78 @@
+/* CSS for larger and responsive popup */
+.popup-container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+.body {
+background-color: #f2f2f2; /* Set your desired background color */
+border-radius: 10px; /* Add rounded corners */
+padding: 20px; /* Add padding for spacing */
+}
+
+.popup-body {
+position: relative;
+width: 80%; /* Adjust the width as needed */
+max-width: 600px; /* Set a maximum width for responsiveness */
+text-align: center;
+margin: auto;
+border-radius: 15px;
+border: 1px solid #ccc;
+background: white;
+box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+overflow: auto;
+}
+
+/* Button styles (unchanged) */
+.button-container {
+position: absolute;
+top: 10px;
+right: 10px;
+}
+
+.button {
+background-color: #4CAF50;
+color: white;
+border: none;
+padding: 10px 20px;
+cursor: pointer;
+}
+
+.button:hover {
+background-color: #45a049;
+}
+
+@media screen and (max-width: 768px) {
+.popup-body {
+    width: 90%; 
+}
+}
+/* Add these CSS rules to style the preplayers div with a running color change animation */
+.preplayers {
+    border-radius: 10px; /* Add rounded corners */
+    margin: 20px 0; /* Add margin for spacing */
+    padding: 10px; /* Add padding for spacing */
+    animation: colorChange 5s infinite alternate; /* Add animation */
+    background-color: #73dcdf; /* Set your initial background color */
+  }
+  
+  /* Define the animation */
+  @keyframes colorChange {
+    0% {
+      background-color: #73dcdf; /* Start with the initial background color */
+    }
+    100% {
+      background-color: #8c8aff; /* End with the target background color */
+    }
+  }
+  
+  

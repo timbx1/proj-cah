@@ -1,20 +1,21 @@
-import React,{ useRef, useState } from 'react'
-import axios from 'axios'
-import config from './config.json'
-import { Hilfe } from './Hilfe'
-import Pack from './Pack'
-import PacksView from './PacksView'
+import React, { useRef, useState } from 'react';
+import axios from 'axios';
+import config from './config.json';
+import { Hilfe } from './Hilfe';
+import Pack from './Pack';
+import PacksView from './PacksView';
 
 function CreateGame(props) {
   const goalInRef = useRef();
   const [goalPoints, setGoalPoints] = useState(10);
   const [packs, setPacks] = useState([]);
   const [currentPacks, setCurrentPacks] = useState([]);
-  const [packDiv,setPackDiv] = useState()
+  const [packDiv, setPackDiv] = useState();
   const [showPacks, setShowPacks] = useState(false);
   const [showPacksView, setShowPacksView] = useState(false);
-  const [errorMsg,setErrorMsg] = useState('')
+  const [errorMsg, setErrorMsg] = useState('');
 
+  // Funktion zum Abrufen von Packs über die API und Anzeigen der ausgewählten Packs
   function getPacks(packsToFetch) {
     Promise.all(
       packsToFetch.map((packId) =>
@@ -27,80 +28,82 @@ function CreateGame(props) {
         createPacks(currentPacks);
       })
       .catch((error) => {
-        console.error('Error fetching packs:', error);
+        console.error('Fehler beim Abrufen von Packs:', error);
       });
   }
 
-  function addId(id){
-    let arr = packs
-    arr.push(id)
-    setPacks(arr)
-    console.log(id)
+  // Funktion zum Hinzufügen einer Pack-ID zur ausgewählten Packliste
+  function addId(id) {
+    let arr = packs;
+    arr.push(id);
+    setPacks(arr);
+    console.log(id);
   }
+
+  // Funktion zum Entfernen einer Pack-ID aus der ausgewählten Packliste
   function removeId(id) {
     console.log(id);
-    let arr = [];
-    for (let i = 0; i < packs.length; i++) {
-      if (!(packs[i] === id)) {
-        arr.push(packs[i]);
-      }
-    }
+    let arr = packs.filter((packId) => packId !== id);
     setPacks(arr);
-  }  
+  }
 
-  function createPacks(pArr){
-    let pList = []
-    pList.push(pArr.map((eintrag) => (
+  // Funktion zum Erstellen von Pack-Komponenten für die Anzeige
+  function createPacks(pArr) {
+    let pList = pArr.map((eintrag) => (
       <div key={eintrag.id}>
         <p> </p>
         <Pack usePack={false} packName={eintrag.name} packId={eintrag.id} bcCount={eintrag.blackCardCount} wcCount={eintrag.whiteCardCount} />
       </div>
-    )))    
-    setPackDiv(pList)
-}
-
-  function handleShowPacks() {
-  if (!showPacks) {
-    getPacks(packs);
-    setShowPacks(true);
-  } else {
-    setPackDiv([]);
-    setShowPacks(false);
+    ));
+    setPackDiv(pList);
   }
-}
 
-function postGame(owner,packs,goal){
-  let gameData = {
-    owner: owner,
-    packs: packs,
-    goal: goal
-  };
-  let Jstring = JSON.stringify(gameData);
-  var msg = JSON.parse(Jstring)
-  axios.post(config.preUrl + 'games/',msg).then(response => {
-    props.changeUi(1,props.pData,response.data.id)
-})
-}
+  // Funktion zum Anzeigen/Verbergen der ausgewählten Packs
+  function handleShowPacks() {
+    if (!showPacks) {
+      getPacks(packs);
+      setShowPacks(true);
+    } else {
+      setPackDiv([]);
+      setShowPacks(false);
+    }
+  }
 
+  // Funktion zum Anzeigen/Verbergen der Packauswahlansicht
   function handleChoosePacks() {
     setShowPacksView(!showPacksView);
   }
-  function handleCreateGame(){
-    setErrorMsg('')
-    if(goalPoints > 0 && goalPoints < 100){
-      if(packs.length > 0){
-        postGame(props.pData.id,packs,goalPoints)
-      }
-      else{
-        setErrorMsg(errorMsg + ' |Packs should not be empty.| ')
-      }
-      
-    }
-    else{
-      setErrorMsg(errorMsg + ' |Invalid Points - Value btw. 0 & 100|')
-    }
 
-  
+  // Funktion zum Erstellen eines neuen Spiels und Weiterleiten zu diesem
+  function handleCreateGame() {
+    setErrorMsg('');
+    if (goalPoints > 0 && goalPoints < 100) {
+      if (packs.length > 0) {
+        postGame(props.pData.id, packs, goalPoints);
+      } else {
+        setErrorMsg('Packs dürfen nicht leer sein.');
+      }
+    } else {
+      setErrorMsg('Ungültige Punkte - Wert zwischen 0 und 100 erforderlich.');
+    }
+  }
+
+  // Funktion zum Senden von Spielinformationen an die API
+  function postGame(owner, packs, goal) {
+    let gameData = {
+      owner: owner,
+      packs: packs,
+      goal: goal
+    };
+    let Jstring = JSON.stringify(gameData);
+    var msg = JSON.parse(Jstring);
+    axios.post(config.preUrl + 'games/', msg)
+      .then((response) => {
+        props.changeUi(1, props.pData, response.data.id);
+      })
+      .catch((error) => {
+        console.error('Fehler beim Erstellen des Spiels:', error);
+      });
   }
 
   return (
@@ -117,19 +120,18 @@ function postGame(owner,packs,goal){
         <label style={{ color: 'red' }}>{errorMsg}</label>
       </div>
       <button onClick={handleShowPacks}>
-        {showPacks ? 'Hide Current Used Packs' : 'Show Current Used Packs'}
+        {showPacks ? 'Verwendete Packs ausblenden' : 'Verwendete Packs anzeigen'}
       </button>
-      {showPacks}
       <div>{packDiv}</div>
       <div>
         <button onClick={handleChoosePacks}>
-          {showPacksView ? 'Hide Packs View' : 'Choose Packs for Game'}
+          {showPacksView ? 'Packauswahl ausblenden' : 'Packs für das Spiel auswählen'}
         </button>
       </div>
       <div>
-          <button onClick={()=>handleCreateGame(props.pData)}>Start Lobby</button>
+        <button onClick={() => handleCreateGame(props.pData)}>Lobby starten</button>
       </div>
-      {showPacksView && <PacksView addId = {addId} removeId = {removeId} usePack={true}></PacksView>}
+      {showPacksView && <PacksView addId={addId} removeId={removeId} usePack={true}></PacksView>}
     </div>
   );
 }

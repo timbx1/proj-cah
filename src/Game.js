@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Pack from './Pack'
 import axios from 'axios'
 import config from './config.json'
+import './Game.css'
 function Game(props) {
 
     const [detailsShown, setDetailsShown] = useState(true)
@@ -11,41 +12,72 @@ function Game(props) {
     const owner = props.owner
     const goal = props.goal
 
+    let showPacks = false
+
+    //const [showPacks, setShowPacks] = useState(false)
+
     const packsArr = props.packs
-    const [packs,setPacks] = useState()
+    let packs
 
     const playerArr = props.player
-    const [player,setPlayer] = useState()
+    const [player,setPlayer] = useState(null)
 
-    const [details, setDetails] = useState() 
+    const [details, setDetails] = useState(null) 
 
     const [player_label, setPlayerLabel] = useState('')
 
-    const [joinGameBtn, setJoinGameBtn] = useState()
+    const [joinGameBtn, setJoinGameBtn] = useState(null)
 
-    function getPacks (){
-        let pacArr = []
-        for (let i = 0; i < packsArr.length;i++ ){
-            axios.get(config.preUrl+'packs/'+ packsArr[i]).then(response =>{
-                pacArr.push(response)
-            })
+    const [packDiv,setPackDiv] = useState(null)
+
+    async function getPacks() {
+        try {
+          await axios.get(config.preUrl+'packs/').then(response => {
+            createPacks(response.data.packs)
+            
+          })
+          
+        } catch (error) {
+          console.error('Fehler beim Abrufen der Packs:', error);
         }
-        console.log(pacArr)
-        createPacks(pacArr)
-    }
+      }
+      
 
-    function createPacks(pacArr){
-        let pList = []
-        pList.push(pacArr.map((eintrag) => (
-        <div>
+      function createPacks(pacArr) {
+        let mapPacs = []
+        console.log(packsArr)
+        for(let i = 0; i < pacArr.length;i++){
+          for(let j = 0; j < packsArr.length;j++){
+            if (pacArr[i].id===packsArr[j]){
+              mapPacs.push(pacArr[i])
+            }   
+          }
+        }
+        console.log(mapPacs)
+        const pList = mapPacs.map((eintrag) => (
+          <div key={eintrag.id}>
             <p> </p>
-            <Pack packName = {eintrag.name} packId={eintrag.id} bcCount = {eintrag.blackCardCount} wcCount = {eintrag.whiteCardCount}/>
+            <Pack
+              packName={eintrag.name}
+              packId={eintrag.id}
+              bcCount={eintrag.blackCardCount}
+              wcCount={eintrag.whiteCardCount}
+            />
+          </div>
+        ));
+        console.log(pList)
+        packs=(<div className="popup-container">
+        <div className="popup-body">
+          <h1>PACKS:</h1>
+          {pList}
+          <div className="button-container">
+          <button className="button" onClick={handleShowPacks}>Close X</button>
+          </div>
         </div>
-        )))
-        setPacks(pList)
-    }
+        </div>);
+      }
+      
     function createPlayer(){
-        console.log('im here')
         let pList = []
         pList.push(playerArr.map((eintrag) => (
             <div key={eintrag.id}>
@@ -53,14 +85,27 @@ function Game(props) {
                 <p>{eintrag.name}</p>
             </div>
             )))
-        console.log(pList)
         setPlayer(pList)
     }
 
-    function handleJoinGameBtn(id, player_data){ //playerData not defined error!!!
-        console.log(player_data)
+    function handleJoinGameBtn(id, player_data){
         props.joinGame(id, player_data)
     }
+
+    function handleShowPacks() {
+        if (!showPacks) {
+          console.log(showPacks)
+          setPackDiv(packs);
+          //setShowPacks(true)
+          showPacks = true
+        } else {
+          console.log(showPacks)
+          setPackDiv(null);
+          //setShowPacks(false)
+          showPacks = false
+        }
+      }
+      
 
     function handleDetails(){
         if(detailsShown){
@@ -81,12 +126,15 @@ function Game(props) {
             )
             setPlayerLabel('Players:')
             setJoinGameBtn(
-                <button onClick={() => handleJoinGameBtn(id,player_data)}>JOIN GAME</button>
+                <div>
+                    <button onClick={handleShowPacks}>Show/Hide Packs</button>
+                    <button onClick={() => handleJoinGameBtn(id,player_data)}>JOIN GAME</button>
+                </div>
+               
             )
         }
         else{
             setDetailsShown(true)
-            setPacks('')
             setPlayer('')
             setDetails(
                 <div></div>
@@ -97,15 +145,17 @@ function Game(props) {
 
         }
   return (
-    <div>
+    <div className='body'>
         <button onClick={handleDetails}>Details</button>
         <div>{details}</div>
-        <div>{player_label}</div>
-        <div>{player}</div>
-        <div>{joinGameBtn}</div>
-        <div>{packs}</div>
         
+        <div className='preplayers'>
+          <div>{player_label}</div>
+          <div>{player}</div>
+        </div>
 
+        <div>{joinGameBtn}</div>
+        <div className='packs-component'>{packDiv}</div>
     </div>
   )
 }

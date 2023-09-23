@@ -4,6 +4,7 @@ import config from './config.json'
 import Recycle_bin from './Recycle_bin'
 import { Hilfe } from './Hilfe'
 import Game from './Game'
+import './PreGame.css'
 
 function PreGame({changeUi, pData, gId}) {
     const nameInRef = useRef()
@@ -171,21 +172,26 @@ function PreGame({changeUi, pData, gId}) {
        
     }
   return (
-    <div>
-        <div>
-            <label>{nameLabel}</label>
+    <div className='prebody'>
+        <div className='searchBox'>
+            <div className="wobble-animation">
+                <label style={{ fontWeight: 'bold' }}>{nameLabel}</label>
+            </div>
 
-            <div>{searchBox}</div>
-            <button onClick={handleCreateGame}>Create Game</button>
-            <button onClick={handleViewPacks}>View Packs</button>
+            <div style={{ margin: '1%' }}>{searchBox}</div>
+            <div style={{ margin: '1%' }}>
+                <button onClick={handleCreateGame}>Create Game</button>
+                <button onClick={handleViewPacks}>View Packs</button>
+            </div>
+
             <Hilfe/>
             <Recycle_bin />
         </div>
         <div>
             <output style={{color: 'red'}}>{outPreGame}</output>
         </div>
-        <div>{gamesLabel}</div>
-        <div>
+        <div><h2>{gamesLabel}</h2></div>
+        <div className="game-container">
             {games}
         </div>
 
