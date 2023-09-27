@@ -23,7 +23,7 @@ const Players = (props) => {
     }
     function getGameData (){
         
-        axios.get(config.preUrl+'/games/').then(response => {
+        axios.get(config.preUrl+'games/').then(response => {
           console.log(response.data.games)
           showPlayers(response.data.games)
           

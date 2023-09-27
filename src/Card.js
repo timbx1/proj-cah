@@ -36,18 +36,8 @@ const Card = (props) => {
 
   // Funktion zum Abstimmen für die Karte
   function voteCard() {
-    console.log('Vote');
-    const Jstring = '{"cards":[' + props.cId + ']}';
-    const msg = JSON.parse(Jstring);
-    // Ein axios-Aufruf, um die Abstimmung durchzuführen
-    axios.put(config.preUrl + 'games/' + props.gId + '/offers/' + props.pId, msg)
-      .then(response => {
-        props.voteCard();
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error('Fehler beim Abstimmen:', error);
-      });
+    props.voteCard(props.cId);
+
   }
 
   return (

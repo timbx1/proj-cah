@@ -9,7 +9,7 @@ export const Status = (props) => {
     },[])
     //holt spiel array
     function getStaus(){
-        axios.get(config.preUrl+'/games/').then(response =>{
+        axios.get(config.preUrl+'games/').then(response =>{
             searchForState(response.data.games)
         })
     }

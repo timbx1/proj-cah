@@ -25,6 +25,8 @@ const InGame = (props) => {
     const [expiryTimestamp, setExpiryTimestamp] = useState(Date.now() + 10000);
 
     let pointArray;
+    let cardIdsArray = []
+    let picksInBC
 
     //'main method'
     useEffect(() => {
@@ -33,26 +35,39 @@ const InGame = (props) => {
 
     // load offer preview and put it
     function offerCard(cId, text) {
+
+        cardIdsArray.push(cId,)
+        console.log(cId)
         setCardToOfferID(cId);
         setCardToOfferText(text);
-        putCard(cId);
+        console.log(picksInBC)
+
+        let picks = []
+        for (let i = 0; i < cardIdsArray.length;i++){
+            if (i > cardIdsArray.length-1-picksInBC){
+                picks.push(cardIdsArray[i])
+            }
+        }
+        if(picks.length = picksInBC){
+            console.log('offeredCard')
+            putCard(picks);
+        }
+    
+            
     }
 
     // load divs
     function refresh() {
+        cardIdsArray= []
+        voteCardIds = []
         pullPoints();
         setCards(null);
         setCardToOfferID(null);
         setCardToOfferText(null);
         setBlackCard(null);
-        setCzar('loading');
+        setCzar('loadingg');
         getBlackCard();
         getCzar();
-        restartTimer();
-    }
-
-    function restartTimer() {
-        setExpiryTimestamp(Date.now() + 10000);
     }
 
     // if czar no white cards
@@ -61,6 +76,9 @@ const InGame = (props) => {
             setCzar(response.data.czar);
             if (response.data.czar.id !== playerData.id) {
                 getWhiteCards();
+            }
+            else{
+                getWaitingPlayers();
             }
         });
     }
@@ -97,6 +115,7 @@ const InGame = (props) => {
     // pull white cards of Player to choose
     function getWhiteCards() {
         axios.get(config.preUrl + 'games/' + gameid + '/cards/' + playerData.id).then(response => {
+            console.log(response.data.cards)
             createWhiteCards(response.data.cards, true);
         });
     }
@@ -105,12 +124,43 @@ const InGame = (props) => {
     function getBlackCard() {
         axios.get(config.preUrl + 'games/' + gameid).then(response => {
             setBlackCard(response.data.currentBlackCard.text);
+            picksInBC = response.data.currentBlackCard.pick
         });
     }
 
+    let voteCardIds=[]
     // callback from Vote button in Cards
-    function voteCard() {
-        refresh();
+    function voteCard(cId) {
+        voteCardIds.push(cId)
+        let picks = []
+        for (let i = 0; i < voteCardIds.length;i++){
+            if (i > voteCardIds.length-1-picksInBC){
+                picks.push(voteCardIds[i])
+                console.log(voteCardIds[i])
+            }
+        }
+        if(picks.length = picksInBC){
+            console.log('voted')
+            putVoteCard(picks);
+        }
+        
+    
+    }
+    function putVoteCard(cIdArr){
+        console.log('Vote');
+        let id_string = JSON.stringify(cIdArr);
+        let Jstring = `{"cards": ${id_string}}`;
+        const msg = JSON.parse(Jstring);
+        // Ein axios-Aufruf, um die Abstimmung durchzuführen
+        axios.put(config.preUrl + 'games/' + gameid + '/offers/' + playerData.id, msg)
+          .then(response => {
+            refresh();
+            console.log(response.data);
+          })
+          .catch(error => {
+            console.error('Fehler beim Abstimmen:', error);
+          });
+        
     }
 
     // if points change refresh page
@@ -118,10 +168,12 @@ const InGame = (props) => {
         axios.get(config.preUrl + 'games/' + gameid).then(response => {
             if (JSON.stringify(response.data.points) === JSON.stringify(pointArray)) {
                 waitForCzarToVote();
+                console.log(response.data.points)
+                console.log(pointArray)
                 console.log('waiting_for_Czar')
             } else {
                 refresh();
-                console.log('refrshing')
+                console.log('refreshing')
             }
         });
     }
@@ -129,8 +181,10 @@ const InGame = (props) => {
     // offer card to czar
     // ----> put wechselt abgegebene Karten
     function putCard(id) {
+        console.log(id)
         //console.log('player: ' + playerData.id + ' game: ' + gameid);
-        let Jstring = '{"cards":[' + id + ']}';
+        let id_string = JSON.stringify(id);
+        let Jstring = `{"cards": ${id_string}}`;
         let msg = JSON.parse(Jstring);
         axios.put(config.preUrl + 'games/' + gameid + '/cards/' + playerData.id, msg).then(response => {
             waitForCzarToVote();
@@ -138,15 +192,44 @@ const InGame = (props) => {
     }
 
     // Timer timeout callback wenn czar dann get offers
-    function onExpire() {
+    async function onExpire() {
+        await timeout(2000)
+        console.log('expire');
         //console.log('player: ' + playerData.id + ' game: ' + gameid);
         if (czar.id === playerData.id) {
+            console.log('Player is Czar')
             axios.get(config.preUrl + 'games/' + gameid + '/offers/' + playerData.id).then(response => {
+                console.log('creatingCzarCards')
                 createZarCards(response.data.offers, false);
-                console.log(response.data.offers);
+                
             });
         }
+        else{
+            console.log('Player is Not Czar')
+        }
     }
+    function checkForPlayers(data){
+        console.log(data.waitingForPlayers)
+        if (data.waitingForPlayers === 0){
+            onExpire()
+        }
+        else{ 
+            console.log('checking_for_players')
+            getWaitingPlayers()
+        }
+
+    }
+    //wenn alle player cards abgegeben dann onExpire
+    function getWaitingPlayers (){
+        axios.get(config.preUrl + 'games/' + gameid).then(response => {
+            checkForPlayers(response.data)
+        });
+    }
+
+    function timeout(delay) {
+        return new Promise( res => setTimeout(res, delay) );
+    }
+
     function createZarCards(cardsArr,boo){
         let cList = []
         for (let i = 0 ; i <cardsArr.length; i++ ){
@@ -183,7 +266,7 @@ const InGame = (props) => {
                 <div id="answer">
                     {cardToOfferText}
                 </div>
-                <div id="timer"><Timer onExpire={onExpire} expiryTimestamp={expiryTimestamp} /></div>
+                
             </div>
             <div id="cards">
                 {cards}
@@ -191,5 +274,5 @@ const InGame = (props) => {
         </div>
     )
 }
-
+//<div id="timer"><Timer onExpire={onExpire} expiryTimestamp={expiryTimestamp} /></div>
 export default InGame;

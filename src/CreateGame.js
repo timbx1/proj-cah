@@ -77,9 +77,10 @@ function CreateGame(props) {
   // Funktion zum Erstellen eines neuen Spiels und Weiterleiten zu diesem
   function handleCreateGame() {
     setErrorMsg('');
+    console.log(goalPoints)
     if (goalPoints > 0 && goalPoints < 100) {
       if (packs.length > 0) {
-        postGame(props.pData.id, packs, goalPoints);
+        postGame(props.pData.id, packs, parseInt(goalPoints));
       } else {
         setErrorMsg('Packs dürfen nicht leer sein.');
       }
