@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/proj-cah/static/css/main.6aa7025b.css",
+    "main.js": "/proj-cah/static/js/main.2b12d1fc.js",
+    "index.html": "/proj-cah/index.html",
+    "main.6aa7025b.css.map": "/proj-cah/static/css/main.6aa7025b.css.map",
+    "main.2b12d1fc.js.map": "/proj-cah/static/js/main.2b12d1fc.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6aa7025b.css",
+    "static/js/main.2b12d1fc.js"
+  ]
+}
