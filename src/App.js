@@ -5,9 +5,10 @@ import InGame from "./InGame";
 import PacksView from "./PacksView";
 import CreateGame from "./CreateGame";
 import './App.css';
+import PlayAnimation from "./PlayAnimation";
 
 function App() {
-  // uiNum: 0 = PreGame; 1 = JoinedGame; 2 = InGame; 3 = PacksView; 4 = CreateGame
+  // uiNum: 0 = PreGame; 1 = JoinedGame; 2 = InGame; 3 = PacksView; 4 = CreateGame 5 = play animation
   const [uiNum, setUiNum] = useState(0);
   const [playerData, setPlayerData] = useState(null);
   const [gameId, setGameId] = useState(null);
@@ -33,7 +34,6 @@ function App() {
     return (
       <div>
         {animatedBackground}
-        {/* PreGame-Komponente mit UI-Wechsel-Funktion und Spielerdaten */}
         <PreGame changeUi={changeUi} pData={playerData} gId={gameId} />
         <p>{playerData}</p>
       </div>
@@ -42,7 +42,6 @@ function App() {
     return (
       <div>
         {animatedBackground}
-        {/* JoinedGame-Komponente mit UI-Wechsel-Funktion und Spielerdaten */}
         <JoinedGame changeUi={changeUi} pData={playerData} gId={gameId} />
       </div>
     );
@@ -50,7 +49,6 @@ function App() {
     return (
       <div>
         {animatedBackground}
-        {/* InGame-Komponente mit UI-Wechsel-Funktion und Spielerdaten */}
         <InGame changeUi={changeUi} pData={playerData} gId={gameId} />
       </div>
     );
@@ -58,7 +56,6 @@ function App() {
     return (
       <div>
         {animatedBackground}
-        {/* PacksView-Komponente mit UI-Wechsel-Funktion und Spielerdaten */}
         <PacksView usePack={false} changeUi={changeUi} pData={playerData} gId={gameId} />
       </div>
     );
@@ -66,8 +63,15 @@ function App() {
     return (
       <div>
         {animatedBackground}
-        {/* CreateGame-Komponente mit UI-Wechsel-Funktion und Spielerdaten */}
         <CreateGame changeUi={changeUi} pData={playerData}></CreateGame>
+      </div>
+    );
+  }
+  else if (uiNum === 5) {
+    return (
+      <div>
+        {animatedBackground}
+        <PlayAnimation changeUi={changeUi} playerData={playerData} gId={gameId}></PlayAnimation>
       </div>
     );
   }

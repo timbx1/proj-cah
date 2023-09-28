@@ -22,16 +22,54 @@ const InGame = (props) => {
     const [blackCard, setBlackCard] = useState();
     const [czar, setCzar] = useState('loading');
 
-    const [expiryTimestamp, setExpiryTimestamp] = useState(Date.now() + 10000);
 
-    let pointArray;
+    let pointArray = [];
     let cardIdsArray = []
     let picksInBC
+    let running = true
+    let czarId;
 
     //'main method'
     useEffect(() => {
         refresh();
     }, []);
+
+    // load divs
+    function refresh() {
+        is_game_running()
+        pullPoints()
+        cardIdsArray= []
+        voteCardIds = []
+        setCards(null);
+        setCardToOfferID(null);
+        setCardToOfferText(null);
+        setBlackCard(null);
+        getBlackCard();
+        getCzar();
+    }
+    //returned runnning variable der API
+    function is_game_running(){
+        axios.get(config.preUrl + 'games/').then(response => {
+            let games = response.data.games
+            for(let i=0;i<games.length;i++){
+                if (games[i].id == gameid){
+                    running = games[i].running
+                    if(running){
+                       
+                        return
+                    }
+                    else{
+                        console.log('animation')
+                        play_animation()
+                    }   
+                }
+            } 
+        });
+    }
+
+    function play_animation(){
+        props.changeUi(5, playerData, gameid)
+    }
 
     // load offer preview and put it
     function offerCard(cId, text) {
@@ -56,24 +94,11 @@ const InGame = (props) => {
             
     }
 
-    // load divs
-    function refresh() {
-        cardIdsArray= []
-        voteCardIds = []
-        pullPoints();
-        setCards(null);
-        setCardToOfferID(null);
-        setCardToOfferText(null);
-        setBlackCard(null);
-        setCzar('loadingg');
-        getBlackCard();
-        getCzar();
-    }
-
     // if czar no white cards
     function getCzar() {
         axios.get(config.preUrl + 'games/' + gameid).then(response => {
             setCzar(response.data.czar);
+            czarId=response.data.czar.id
             if (response.data.czar.id !== playerData.id) {
                 getWhiteCards();
             }
@@ -165,17 +190,19 @@ const InGame = (props) => {
 
     // if points change refresh page
     function waitForCzarToVote() {
-        axios.get(config.preUrl + 'games/' + gameid).then(response => {
-            if (JSON.stringify(response.data.points) === JSON.stringify(pointArray)) {
-                waitForCzarToVote();
-                console.log(response.data.points)
-                console.log(pointArray)
-                console.log('waiting_for_Czar')
-            } else {
-                refresh();
-                console.log('refreshing')
-            }
-        });
+        if(running){
+            axios.get(config.preUrl + 'games/' + gameid).then(response => {
+                if (JSON.stringify(response.data.points) === JSON.stringify(pointArray)) {
+                    waitForCzarToVote();
+                    console.log(response.data.points)
+                    console.log(pointArray)
+                    console.log('waiting_for_Czar')
+                } else {
+                    refresh();
+                    console.log('refreshing')
+                }
+            });
+        }
     }
 
     // offer card to czar
@@ -196,7 +223,7 @@ const InGame = (props) => {
         await timeout(2000)
         console.log('expire');
         //console.log('player: ' + playerData.id + ' game: ' + gameid);
-        if (czar.id === playerData.id) {
+        if (czarId == playerData.id) {
             console.log('Player is Czar')
             axios.get(config.preUrl + 'games/' + gameid + '/offers/' + playerData.id).then(response => {
                 console.log('creatingCzarCards')
@@ -247,7 +274,7 @@ const InGame = (props) => {
 
     return (
         <div>
-            <p align="center" id="title"> CARDS AGAINST HUMANITY: <Status gId={gameid}/> <Hilfe/> </p>
+            <div align="center" id="title"> <p>CARDS AGAINST HUMANITY: </p><Status gId={gameid}/> <Hilfe/> </div>
             <div id='wrapperPlayerPoints'>
                 <div id='players'><Players pData={playerData} gId={gameid} /></div>
                 <div id='points'>
