@@ -37,34 +37,37 @@ const InGame = (props) => {
     // load divs
     function refresh() {
         is_game_running()
-        pullPoints()
-        cardIdsArray= []
-        voteCardIds = []
-        setCards(null);
-        setCardToOfferID(null);
-        setCardToOfferText(null);
-        setBlackCard(null);
-        getBlackCard();
-        getCzar();
+        if(running){
+            pullPoints()
+            cardIdsArray= []
+            voteCardIds = []
+            setCards(null);
+            setCardToOfferID(null);
+            setCardToOfferText(null);
+            setBlackCard(null);
+            getBlackCard();
+            getCzar();
+        }
     }
     //returned runnning variable der API
     function is_game_running(){
         axios.get(config.preUrl + 'games/').then(response => {
-            let games = response.data.games
-            for(let i=0;i<games.length;i++){
-                if (games[i].id == gameid){
-                    running = games[i].running
-                    if(running){
-                       
-                        return
-                    }
-                    else{
-                        console.log('animation')
-                        play_animation()
-                    }   
-                }
-            } 
+            check_game_end(response.data.games)
         });
+    }
+    function check_game_end(games){
+        for(let i=0;i<games.length;i++){
+            if (games[i].id == gameid){
+                running = games[i].running
+                if(running){
+                    return
+                }
+                else{
+                    console.log('animation')
+                    play_animation()
+                }   
+            }
+        }
     }
 
     function play_animation(){
@@ -190,6 +193,7 @@ const InGame = (props) => {
 
     // if points change refresh page
     function waitForCzarToVote() {
+        is_game_running()
         if(running){
             axios.get(config.preUrl + 'games/' + gameid).then(response => {
                 if (JSON.stringify(response.data.points) === JSON.stringify(pointArray)) {

@@ -14,18 +14,31 @@ function PlayAnimation(props) {
   }, []);
   function get_winner(){
     axios.get(config.preUrl + 'games/').then(response => {
-      let games = response.data.games
-      for(let i=0;i<games.length;i++){
-          if (games[i].id == gameid){
-              if(games[i].winner.id = pData.id){
-                setText('WINNER')
-              }
-              else{
-                setText('LOOSER')
-              }   
-          }
-      } 
+      show_winner(response.data.games)
   });
+  }
+  function show_winner(games){
+    for(let i=0;i<games.length;i++){
+      if (games[i].id == gameid){
+          if(games[i].winner.id == pData.id){
+            setText('WINNER')
+            back_to_main()
+          }
+          else{
+            setText('LOOSER')
+            back_to_main()
+          }   
+      }
+  } 
+
+  function timeout(delay) {
+    return new Promise( res => setTimeout(res, delay) );
+  }
+
+  async function back_to_main(){
+    await timeout(7000)
+    window.location.reload(true);
+  }
   }
 
 
